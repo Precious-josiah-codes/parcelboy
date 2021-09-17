@@ -2,7 +2,7 @@
   <div>
       <!-- header nav -->
       <div 
-      class="flex items-center px-4 h-20 font-Poppins shadow-xl">
+      class="flex items-center w-full bg-white top-0 px-4 h-20 font-Poppins shadow-xl" style="position: fixed">
           <div @click="$router.go(-1)">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
           </div>
@@ -17,67 +17,46 @@
  <!-- <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> -->
       <!-- notification list -->
       <div>
-          <div class="flex items-center font-Poppins mt-6 px-3">
+          <div class="flex items-center font-Poppins mt-6 px-3"
+          v-for="notification in userStore.state.userNotification" :key="notification">
               <div 
               style="
               color: #54E346;
               width: 15%">
-                  <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span v-if="notification.title === 'Confirmation'">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </span>
+                  <span style="color: red" v-if="notification.title === 'Cancelled'">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                  </span>
               </div>
               <div 
               style="
               padding-right: 5px;
               width: 70%;
               "
-              class="text-sm">Lorem, ipsum dolor sit amet consectetur adipisicing elit. At, nam!</div>
+              class="text-sm">{{notification.msg}}</div>
               <div 
               style="color: #A2A2A2"
-              class="text-sm" >Yesterday</div>
+              class="text-sm" >{{!notification.date ? notification.date : notification.date.slice(11,16)}}</div>
           </div>
-          <div class="flex items-center font-Poppins mt-6 px-3">
-              <div 
-              style="
-              color: #54E346;
-              width: 15%">
-                  <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              </div>
-              <div 
-              style="
-              padding-right: 5px;
-              width: 70%;
-              "
-              class="text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores corporis sapiente ab! Asperiores, aperiam odio.</div>
-              <div 
-              style="color: #A2A2A2"
-              class="text-sm" >3:15</div>
-          </div>
-          <div class="flex items-center font-Poppins mt-6 px-3">
-              <div 
-              style="
-              color: #54E346;
-              width: 15%">
-                  <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              </div>
-              <div 
-              style="
-              padding-right: 5px;
-              width: 70%;
-              "
-              class="text-sm">Lorem, ipsum dolor sit amet consectetur adipisicing elit. At, nam!</div>
-              <div 
-              style="color: #A2A2A2"
-              class="text-sm" >Yesterday</div>
-          </div>
-         
-          
       </div>
 
   </div>
 </template>
 
 <script>
-export default {
+import { inject } from '@vue/runtime-core'
 
+export default {
+    setup() {
+        const userStore = inject('userStore')
+      
+
+        return { userStore }
+    }
 }
 </script>
 

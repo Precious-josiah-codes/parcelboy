@@ -238,7 +238,7 @@
 
         <!-- PROCEED TO PAYMENT BTN -->
         <div v-if="hideThis" class=" text-center text-colorFive" v-bind:style="{paddingTop: addPaddingPaymentBtn}">
-        <button v-if="pickupDriverArrived" @click='placeOrder' class="font-medium w-72 py-3 mb-2 rounded-full font-Poppins" style="background-color: #2F455C; color: white">PROCEED TO PAYMENT</button>
+        <button v-if="pickupDriverArrived" @click='payWithPaystack' class="font-medium w-72 py-3 mb-2 rounded-full font-Poppins" style="background-color: #2F455C; color: white">PROCEED TO PAYMENT</button>
 
         </div>
 
@@ -352,51 +352,65 @@ export default {
     const bargainCost = ref(0)
 
 
-    // adding flutter wave payment api
-    const script = document.createElement("script");
-    script.src = "https://checkout.flutterwave.com/v3.js";
-    document.getElementsByTagName("head")[0].appendChild(script);
-
     // payment function
-    const placeOrder = () => {
-        window.FlutterwaveCheckout({
-            public_key: "FLWPUBK_TEST-f9ffbb193cebd046e5b821dc412eb5ee-X",
-            tx_ref: "delivery"+ new Date(),
-            amount: bargainCost.value,
-            currency: "NGN",
-            country: "NG",
-            // payment_options: "card",
-            customer: {
-              email: userStore.state.userProfile.email,
-              phone_number: userStore.state.userProfile.phone,
-              name: userStore.state.userProfile.fullName,
+    const payWithPaystack = () => {
+    var handler = PaystackPop.setup({
+      key: 'pk_test_657c6c0a2353c022299db02275bd3a58e66b8fe4',
+      email: userStore.state.userProfile.email,
+      amount: bargainCost.value,
+      currency: "NGN",
+      ref: userStore.state.userProfile.phone+Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+      metadata: {
+         custom_fields: [
+            {
+                display_name: "Name",
+                variable_name: "name",
+                value: userStore.state.userProfile.fullName
             },
-            callback: function(data) {
-                console.log(data);
-                if (data.status === 'successful') {
-                  console.log('payment is successfull')
-                  
-                }
-            },
-            onclose: function() {
-              console.log('modal closed')
-              setTimeout(() => {
-                  driverAgreed.value = false
-                  hideThis.value = false
-                  pickupDriverArrived.value = false
-                  deliveryDetails.value = true
-                  addPadding.value = '8%' 
-                  ongoingDelivery.value = true
-                  console.log('timeout flutter call back')
-              }, 3000);
-            },
-            customizations: {
-                title: "ParcelBoy",
-                description: "Payment for Delivery",
-                logo: require('@/assets/images/parcelboy_log@1.png'),
-            },
-        });
-    }      
+            {
+                display_name: "Mobile Number",
+                variable_name: "mobile_number",
+                value: userStore.state.userProfile.phone
+            }
+         ]
+      },
+      callback: function(response){
+          // alert('success. transaction ref is ' + response.reference);
+          console.log(response.status)
+          setTimeout(() => {
+            driverAgreed.value = false
+            hideThis.value = false
+            pickupDriverArrived.value = false
+            deliveryDetails.value = true
+            addPadding.value = '8%' 
+            ongoingDelivery.value = true
+            console.log('timeout flutter call back')
+        }, 3000);
+
+        const payment = { 
+          paymentMethod: 'wallet', 
+          amount: bargainCost.value, 
+          paymentProof: {
+              "reference": response.reference,
+              "trans": response.trans,
+              "status": response.status,
+              "message": response.message,
+              "transaction": response.transaction,
+              "trxref": response.trxref
+          } 
+        }
+
+        if (response.status === "success") {
+          userStore.actions.makePaymentPaystack(payment)
+        }
+      },
+      onClose: function(){
+            console.log('timeout paystack call back')
+      }
+    });
+    handler.openIframe();
+  }
+      
 
     watchEffect(() => {
       if(props.goBackCourier) {
@@ -729,7 +743,7 @@ export default {
       pickUpDetails, driverSearch, timeDriverSearch, bargain, pending, paddingOne, userStore, deliveryDetails, hideThis,
       beforeEnter, enter, displayDelivery, showCourierOption, bargainBtn, driverAgreed, closeExhausted,
       beforeEnterTwo, enterTwo, displayPickDetails, goBackDelivery, addPadding, pendingTwo, bargainPriceInput, pickupDriverArrived, payment, addPaddingPaymentBtn,
-      displayDriverSearch, displayPriceInput, bargainPrice, deliveryOptions, showDelivery, hideBargainElement, placeOrder, delivered }
+      displayDriverSearch, displayPriceInput, bargainPrice, deliveryOptions, showDelivery, hideBargainElement, delivered, payWithPaystack }
   }
 }
 </script>

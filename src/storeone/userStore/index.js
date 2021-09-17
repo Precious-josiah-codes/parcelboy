@@ -446,12 +446,39 @@ const actions = {
         }
      
         axios.put(
-            `https://handle-cors.herokuapp.com/https://parcelboy.herokuapp.com/api/users/${state.getDeliveryPickup.sender}`, notification, config)
+            `https://parcelboy.herokuapp.com/api/users/${state.getDeliveryPickup.sender}`, notification, config)
         .then(response => {
             if (response.status === 200) {
                 console.log('sending notification', response, state.userId)
             } else {
                 console.log('sending notification', response)
+            }
+        })
+        .catch(error => {
+            if(error.response) {
+                console.log(error.response, error.response.data)
+                if(error.response.data) {
+                    console.log('data', error.response.data)
+                } else if (error.request) {
+                    console.log(error.request)
+                } else {
+                    console.log('something weird just happened')
+                }
+            }
+        })
+    },
+
+    makePaymentPaystack(payment) {
+        const config = {
+            headers: { Authorization: `Bearer ${state.token}`}
+        }
+     
+        axios.put(`https://parcelboy.herokuapp.com/api/pickupdelivery/make-payment/${state.pickupId}`, payment, config)
+        .then(response => {
+            if (response.status === 200) {
+                console.log('makin payment', response)
+            } else {
+                console.log('makin payment', response)
             }
         })
         .catch(error => {
@@ -531,7 +558,7 @@ const actions = {
         console.log('cancelling.....')
         
 
-        axios.put(`https://parcelboy.herokuapp.com/api/bargain/cancel/${state.pickupId }/${state.driverId}/${state.bargain.id}`, 'cancelling request', config)
+        axios.put(`https://parcelboy.herokuapp.com/api/bargain/cancel/${state.pickupId}/${state.driverId}/${state.bargain.id}`, 'cancelling request', config)
         .then(response => {
             if (response.status === 200) {
                 console.log('driver id cancelled', state.driverId)

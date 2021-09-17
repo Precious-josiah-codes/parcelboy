@@ -4,7 +4,10 @@
           <side-nav-driver @signout="signout"/>
       </div>
      <div>
-         <driver-navbar/>
+         <driver-navbar @displayWallet="displayWallet"/>
+     </div>
+     <div>
+         <wallet v-if="wallet" @removeWallet="removeWallet"/>
      </div>
       <div class="image-map w-full">
         <!-- <img :src="require('@/assets/images/map.png')" alt="map icon" />
@@ -170,7 +173,7 @@
 
       <div class="w-full h-full absolute bottom-0 top-0 z-20" v-if="showDeliveryDetails">
           <delivery-details @closeDeliveryDetails="closeDeliveryDetails"/>
-        </div>
+      </div>
       
   </div>
 </template>
@@ -182,9 +185,10 @@ import SideNavDriver from '../../components/SideNavDriver.vue'
 import DeliveryDetails from '../../components/DeliveryDetails.vue'
 import DriverMap from '../../components/DriverMap.vue'
 import DriverNavbar from '../../components/DriverNavbar.vue'
+import Wallet from '../../components/Wallet.vue'
 
 export default {
-  components: { BottomMenu, SideNavDriver, DeliveryDetails, DriverMap, DriverNavbar },
+  components: { BottomMenu, SideNavDriver, DeliveryDetails, DriverMap, DriverNavbar, Wallet },
   setup() {
       const userStore = inject('userStore')
       const showBargainUser = ref(false)
@@ -200,8 +204,18 @@ export default {
       const driverNotification = ref('')
       const notificationHeight = ref('450px')
       const driverNotificationColor = ref('#21D0B2')
+      const wallet = ref(false)
+
       
      
+
+      const displayWallet = () => {
+          wallet.value = !wallet.value
+      }
+      
+      const removeWallet = () => {
+          wallet.value = !wallet.value
+      }
 
       const openSideBar = () => {
           console.log('val')
@@ -366,8 +380,8 @@ export default {
       userStore.actions.getUserDetails()
 
       return { 
-          openSideBar, userStore, signout, showBargainUser, showNotificationBar, priceInput, showDeliveryDetails, closeDeliveryDetails, driverNotificationColor, cancelBtn, startDelivery,
-          btnColor, acceptBargain, reBargain, btnDisable, driverNotification, priceInputValue,
+          openSideBar, userStore, signout, showBargainUser, showNotificationBar, priceInput, showDeliveryDetails, closeDeliveryDetails, driverNotificationColor, cancelBtn, startDelivery, wallet, removeWallet,
+          btnColor, acceptBargain, reBargain, btnDisable, driverNotification, priceInputValue, displayWallet,
           helpBool, deliveryStarted, notificationHeight, confirmDelivery, displayPriceInput }
   }
 
